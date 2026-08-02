@@ -32,13 +32,13 @@ option("rex_toml", function()
 end)
 
 option("skyrim_se", function()
-    set_default(true)
+    set_default(false)
     set_description("Enable runtime support for Skyrim SE")
     add_defines("ENABLE_SKYRIM_SE=1")
 end)
 
 option("skyrim_ae", function()
-    set_default(true)
+    set_default(false)
     set_description("Enable runtime support for Skyrim AE")
     add_defines("ENABLE_SKYRIM_AE=1")
 end)
@@ -107,6 +107,10 @@ target("commonlibsse-ng", function()
         -- so the target stays a source build. The download runs at most once per tag
         -- (cached under build/.prebuilt/<tag>; a failure is remembered, not retried).
         local function resolve()
+            -- The only published prebuilt has the all-runtime ABI.
+            if not (has_config("skyrim_se") and has_config("skyrim_ae") and has_config("skyrim_vr")) then
+                return nil
+            end
             if os.isfile(path.join(scriptdir, "lib", "commonlibsse-ng.lib")) then
                 return scriptdir
             end
